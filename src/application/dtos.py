@@ -1,24 +1,18 @@
-from datetime import date, timedelta
+from datetime import date
 
-from pydantic import BaseModel, Field
-
-from src.application.helpers import date_now
-
-
-def default_start_date() -> date:
-    return date_now() - timedelta(weeks=1)
+from pydantic import BaseModel
 
 
 class WeatherFilters(BaseModel):
-    start_date: date = Field(default_factory=default_start_date)
-    end_date: date = Field(default_factory=date_now)
-    city: str = Field(default="Moscow")
+    start_date: date
+    end_date: date
+    city: str
 
 
 class WeatherDTO(BaseModel):
     id: int
     city: str
-    date: date
+    measurement_date: date
     temperature: float
     humidity: float
 

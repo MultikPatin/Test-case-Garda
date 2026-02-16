@@ -28,8 +28,8 @@ class App:
 
         self._api.include_router(
             router=router,
-            prefix="Weather",
-            tags=["/weather"],
+            prefix="/weather",
+            tags=["Weather"],
         )
 
     @property
