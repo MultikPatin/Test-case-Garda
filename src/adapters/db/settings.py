@@ -27,6 +27,11 @@ class PostgresSettings(BaseSettings):
         default=DEFAULT_DATABASE, min_length=1, max_length=255
     )
 
+    ECHO: bool = Field(default=False)
+    ECHO_POOL: bool = Field(default=False)
+    POOL_SIZE: int = Field(default=50, gt=0, lt=100)
+    MAX_OVERFLOW: int = Field(default=10, gt=0, lt=100)
+
     @property
     def dsn(self) -> PostgresDsn:
         return PostgresDsn.build(

@@ -12,7 +12,7 @@ from src.application.constants import (
 from src.application.settings import get_versioned_prefix, set_model_config
 
 
-class VSettings(BaseSettings):
+class Settings(BaseSettings):
     model_config = set_model_config(
         env_prefix=get_versioned_prefix(
             prefix=WEATHER_API_ENV_PREFIX,

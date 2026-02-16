@@ -8,11 +8,11 @@ from src.application.enums import URLEnum
 from .controllers import router
 
 if TYPE_CHECKING:
-    from .settings import VSettings
+    from .settings import Settings
 
 
-class VApp:
-    def __init__(self, is_dev_mode: bool, settings: "VSettings") -> None:
+class App:
+    def __init__(self, is_dev_mode: bool, settings: "Settings") -> None:
         self._path = settings.path
         docs_url = (
             None if settings.IS_STATIC_DOCS or not is_dev_mode else URLEnum.docs

@@ -7,4 +7,4 @@ if [ -z "$API_PORT" ]; then
   API_PORT=8000
 fi
 
-uv run uvicorn src.composites.constructor:app --host 0.0.0.0 --port $API_PORT --log-level $API_LOG_LEVEL --proxy-headers --forwarded-allow-ips '*'
+uv run uvicorn src.composites.weather.py:app --host 0.0.0.0 --port $API_PORT --log-level $API_LOG_LEVEL --proxy-headers --forwarded-allow-ips '*'
