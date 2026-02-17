@@ -4,21 +4,50 @@ x-airflow-common:
   env_file:
     - .env
   volumes:
-    - ./dags:/dags:/opt/airflow/dags
-    - ./logs:/logs:/opt/airflow/logs
-    - ./config:/config:/opt/airflow/config
-    - ./plugins:/plugins:/opt/airflow/plugins
-  #    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-  #    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-  #    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-  #    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./config:/opt/airflow/config
+    - ./plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID}:0"
   depends_on:
     &airflow-common-depends-on
     postgres:
       condition: service_healthy
+    weather-postgres:
+      condition: service_healthy
 
 services:
+  weather-postgres:
+    container_name: ${POSTGRES_HOST}
+    image: ${POSTGRES_IMAGE}
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    ports:
+      - "5051:${POSTGRES_PORT}"
+
+  weather-api:
+    build:
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      weather-postgres:
+        condition: service_healthy
+    ports:
+      - "${MAIN_API_PORT}:${MAIN_API_PORT}"
+
+
   postgres:
     image: ${POSTGRES_IMAGE}
     environment:
@@ -39,6 +68,10 @@ services:
     command: api-server
     ports:
       - "8080:8080"
+    environment:
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - OPENWEATHER_BASE_URL=${OPENWEATHER_BASE_URL}
+      - AIRFLOW_POSTGRES_CONN_ID=${AIRFLOW_POSTGRES_CONN_ID}
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://localhost:8080/api/v2/version" ]
       interval: 30s
@@ -199,4 +232,8 @@ services:
       <<: *airflow-common-depends-on
 
 volumes:
+  postgres_data:
   airflow-postgres:
+
+networks:
+  services:
