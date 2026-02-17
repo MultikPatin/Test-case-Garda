@@ -36,8 +36,9 @@ def camel_case_to_snake_case(input_str: str) -> str:
     return "".join(chars)
 
 
-def datetime_now(tz: "tzinfo" = UTC) -> datetime:
-    return datetime.now(tz)
+def get_current_dt(tz: "tzinfo" = UTC) -> datetime:
+    dt = datetime.now(tz)
+    return dt.replace(microsecond=0, tzinfo=None)
 
 
 def date_now(tz: "tzinfo" = UTC) -> date:

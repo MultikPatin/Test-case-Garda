@@ -18,14 +18,12 @@ class PostgresSettings(BaseSettings):
 
     HOST: str = Field(default=DEFAULT_HOST, min_length=1, max_length=255)
     PORT: int = Field(default=DEFAULT_POSTGRES_PORT, gt=0, lt=65536)
-    USERNAME: str = Field(default=DEFAULT_USERNAME, max_length=255)
+    USER: str = Field(default=DEFAULT_USERNAME, max_length=255)
     PASSWORD: SecretStr = Field(default=DEFAULT_PASSWORD, max_length=255)
     SCHEMA: str = Field(
         default=DEFAULT_POSTGRES_SCHEMA, min_length=1, max_length=255
     )
-    DATABASE: str = Field(
-        default=DEFAULT_DATABASE, min_length=1, max_length=255
-    )
+    DB: str = Field(default=DEFAULT_DATABASE, min_length=1, max_length=255)
 
     ECHO: bool = Field(default=False)
     ECHO_POOL: bool = Field(default=False)
@@ -36,9 +34,9 @@ class PostgresSettings(BaseSettings):
     def dsn(self) -> PostgresDsn:
         return PostgresDsn.build(
             scheme=self.SCHEMA,
-            username=self.USERNAME,
+            username=self.USER,
             password=self.PASSWORD.get_secret_value(),
             host=self.HOST,
             port=self.PORT,
-            path=self.DATABASE,
+            path=self.DB,
         )

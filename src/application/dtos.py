@@ -1,20 +1,23 @@
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel
 
 
 class WeatherFilters(BaseModel):
-    start_date: date
-    end_date: date
+    start_date: datetime
+    end_date: datetime
     city: str
 
 
 class WeatherDTO(BaseModel):
     id: int
     city: str
-    measurement_date: date
+    date: datetime
     temperature: float
     humidity: float
+
+    class Config:
+        from_attributes = True
 
 
 class WeatherList(BaseModel):

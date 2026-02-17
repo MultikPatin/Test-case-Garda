@@ -4,7 +4,7 @@ ARG UV_VERSION=latest
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 
 # ==== base python ====
-FROM harbor.abgroup.tech/docker.io_hub/python:3.12-slim AS base
+FROM python:3.12-slim AS base
 
 COPY --from=uv /uv /bin/uv
 
@@ -38,12 +38,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Создаем пользователя
 RUN useradd -m -u 1000 appuser
 
-COPY --chown=1000:1000 common/ ./common/
 COPY --chown=1000:1000 src/ ./src/
-COPY --chown=1000:1000 deployment/docker/entrypoint*.sh /usr/local/bin/
+COPY --chown=1000:1000 ./alembic.ini .
+COPY --chown=1000:1000 ./entrypoint.sh .
 
-RUN chmod +x /usr/local/bin/entrypoint*.sh
+RUN chmod +x ./entrypoint*.sh
 
 USER appuser
 
-EXPOSE 8000
+CMD ["./entrypoint.sh"]
