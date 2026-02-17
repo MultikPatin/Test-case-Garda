@@ -4,10 +4,14 @@ x-airflow-common:
   env_file:
     - .env
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ./dags:/dags:/opt/airflow/dags
+    - ./logs:/logs:/opt/airflow/logs
+    - ./config:/config:/opt/airflow/config
+    - ./plugins:/plugins:/opt/airflow/plugins
+  #    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+  #    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+  #    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+  #    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID}:0"
   depends_on:
     &airflow-common-depends-on
@@ -18,13 +22,13 @@ services:
   postgres:
     image: ${POSTGRES_IMAGE}
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+      - POSTGRES_DB=${AIRFLOW_POSTGRES_DB}
+      - POSTGRES_USER=${AIRFLOW_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${AIRFLOW_POSTGRES_PASSWORD}
     volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
+      - airflow-postgres:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "airflow" ]
+      test: [ "CMD", "pg_isready", "-U", "${AIRFLOW_POSTGRES_USER}" ]
       interval: 10s
       retries: 5
       start_period: 5s
@@ -182,11 +186,11 @@ services:
     profiles:
       - debug
     environment:
-      _AIRFLOW_DB_MIGRATE: 'true'
-      _AIRFLOW_WWW_USER_CREATE: 'true'
-      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
-      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
-      _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+      - _AIRFLOW_DB_MIGRATE=${AIRFLOW_CLI_DB_MIGRATE}
+      - _AIRFLOW_WWW_USER_CREATE=${AIRFLOW_CLI_WWW_USER_CREATE}
+      - _AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_CLI_WWW_USER_USERNAME}
+      - _AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_CLI_WWW_USER_PASSWORD}
+      - PIP_ADDITIONAL_REQUIREMENTS=${_PIP_ADDITIONAL_REQUIREMENTS:-}
     command:
       - bash
       - -c
@@ -195,4 +199,4 @@ services:
       <<: *airflow-common-depends-on
 
 volumes:
-  postgres-db-volume:
+  airflow-postgres:
