@@ -42,7 +42,8 @@ COPY --chown=1000:1000 src/ ./src/
 COPY --chown=1000:1000 ./alembic.ini .
 COPY --chown=1000:1000 ./entrypoint.sh .
 
-RUN chmod +x ./entrypoint*.sh
+RUN chmod +x ./entrypoint.sh && \
+    sed -i 's/\r$//' ./entrypoint.sh
 
 USER appuser
 
