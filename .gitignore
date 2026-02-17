@@ -2,6 +2,7 @@
 .tmp/
 /trash/
 /data_sets
+/config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

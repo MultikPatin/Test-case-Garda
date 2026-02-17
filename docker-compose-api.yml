@@ -1,8 +1,8 @@
 services:
 
-  postgres:
+  weather-postgres:
     container_name: ${POSTGRES_HOST}
-    image: postgres:${POSTGRES_VERSION}
+    image: ${POSTGRES_IMAGE}
     restart: always
     environment:
       - POSTGRES_DB=${POSTGRES_DATABASE}
@@ -28,7 +28,7 @@ services:
     env_file:
       - .env
     depends_on:
-      postgres:
+      weather-postgres:
         condition: service_healthy
     ports:
       - "${MAIN_API_PORT}:${MAIN_API_PORT}"
