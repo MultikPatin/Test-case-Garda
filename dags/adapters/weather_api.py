@@ -55,6 +55,7 @@ class OpenWeatherMapClient:
 
         for attempt in range(self._max_retries):
             attempt_str = f"{attempt + 1}/{self._max_retries}"
+
             try:
                 logger.debug(f"Запрос к {url} с параметрами: {params}")
                 response = self.session.get(
@@ -108,20 +109,14 @@ class OpenWeatherMapClient:
             return None
 
         try:
-            weather_info = {
-                "city": data.get("name", "Unknown"),
-                "temperature": data["main"]["temp"],
-                "humidity": data["main"]["humidity"],
-                "timezone": data.get("timezone", 0),
-            }
             result = WeatherDTO(
-                city=weather_info["city"],
-                temperature=weather_info["temperature"],
-                humidity=weather_info["humidity"],
-                timezone=weather_info["timezone"],
+                city=data["name"],
+                temperature=data["main"]["temp"],
+                humidity=data["main"]["humidity"],
+                timezone=data["timezone"],
             )
 
-            logger.info(f"Успешно получены данные для {weather_info['city']}")
+            logger.info(f"Успешно получены данные для {result.city}")
             return result  # noqa: TRY300
 
         except KeyError:
