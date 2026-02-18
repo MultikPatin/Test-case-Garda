@@ -13,6 +13,7 @@ logger = logging.getLogger("airflow.task")
 API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
 BASE_URL = os.getenv("OPENWEATHER_BASE_URL", "")
 POSTGRES_CONN_ID = os.getenv("AIRFLOW_POSTGRES_CONN_ID")
+SCHEDULE = "0 3 * * *"
 
 CITIES = {
     "moscow": {"lat": 55.7558, "lon": 37.6176, "city_name": "moscow"},
@@ -95,9 +96,10 @@ def save_results_to_postgres(**context) -> None:  # type: ignore[no-untyped-def]
 
 
 with DAG(
-    dag_id="weather_dag_parallel_tasks",
+    dag_id="weather_dag",
     default_args=default_args,
-    description="Параллельное получение погоды для городов",
+    schedule=SCHEDULE,
+    description="Получение погоды для городов",
     catchup=False,
     tags=["weather", "postgres", "storage"],
 ) as dag:
